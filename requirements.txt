@@ -1,0 +1,6 @@
+awscli==1.22.66
+boto3==1.21.11
+botocore==1.24.11
+sagemaker==2.82.2
+joblib==1.1.0
+django-environ==0.8.1
