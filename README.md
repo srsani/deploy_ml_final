@@ -5,4 +5,15 @@ for a Text classification application. This work is the final project for Udacit
 
 ## Setup
 
-This pieline can be exciated 
+### local setup
+
+- `virtualenv venv --python=python3.8`
+- `pip install ipykernel`
+- `python -m ipykernel install --user --name venv --display-name PYTHON_ENV_NAME`
+- `pip install -r requirements.txt`
+
+## Run the pipeline
+
+The following command is used to run the pipeline from your local env:
+
+`python src/pipeline.py BRANCH_NAME`
