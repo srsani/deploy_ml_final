@@ -290,7 +290,7 @@ def sagemaker_pipeline(bucket_name,
     processing_instance_count = ParameterInteger(
         name="ProcessingInstanceCount", default_value=1)
     processing_instance_type = ParameterString(
-        name="ProcessingInstanceType", default_value="ml.m5.12xlarge")
+        name="ProcessingInstanceType", default_value="ml.m5.4xlarge")
 
     step_preprocess_data = data_processing(processing_repository_uri=processing_repository_uri,
                                            bucket_name=bucket_name,

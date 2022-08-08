@@ -1,7 +1,7 @@
-# deploy_ml_final
+# AWS BYOC pipeline for a text classification application
 
 In the current code repository, you can find the code for the Amazon SageMaker MLOps workflow
-for a Text classification application. This work is the final project for Udacity AWS MLOps nano degree.
+for a Text classification application using Bring Your Own Container (BYOC) approach, which means each note in the pipeline is based on docker image that is stored in Elastic Container Registry (ECR).  This work is the final project for Udacity AWS MLOps nano degree.
 
 ## Setup
 
