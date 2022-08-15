@@ -11,7 +11,7 @@ import uuid
 
 main = Predict('models/model.joblib',
                'models/le_classes.npy',
-               'test/tt')
+               'develop')
 s3 = boto3.client('s3')
 
 app = Flask(__name__)
@@ -46,7 +46,7 @@ def transformation():
 
     json_object = {
         'metadata': {
-            'source': 'test/tt',
+            'source': 'develop',
             'type': 'prediction',
             'datetime':  int(time.time()),
 
@@ -65,7 +65,7 @@ def transformation():
     # lod data to s3
     bucket_name = 'hmlr-dp-poc4-data'
     log_name = str(uuid.uuid4())
-    data_key = f'logs/test/tt/{log_name}.json'
+    data_key = f'logs/develop/{log_name}.json'
 
     s3.put_object(
         Body=json.dumps(json_object),

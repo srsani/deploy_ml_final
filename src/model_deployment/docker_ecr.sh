@@ -1,7 +1,7 @@
 # Name of algo -> ECR
 tag_name=$1
 # model_path=$2
-algorithm_name=sagemaker-deployment-hmlr
+algorithm_name=sagemaker-deployment-redj
 
 # export AWS_ACCESS_KEY_ID=
 # export AWS_SECRET_ACCESS_KEY=

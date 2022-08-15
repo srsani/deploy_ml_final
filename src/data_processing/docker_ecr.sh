@@ -1,6 +1,6 @@
 tag_name=$1
 # Name of algo -> ECR
-algorithm_name=sagemaker-processing-hmlr
+algorithm_name=sagemaker-processing-redj
 
 cd src/data_processing
 

@@ -128,3 +128,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 docker.tar.gzip
+src/.DS_Store

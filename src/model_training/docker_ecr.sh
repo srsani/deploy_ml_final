@@ -1,6 +1,6 @@
 tag_name=$1
 # Name of algo -> ECR
-algorithm_name=sagemaker-train-hmlr
+algorithm_name=sagemaker-train-redj
 
 cd src/model_training
 

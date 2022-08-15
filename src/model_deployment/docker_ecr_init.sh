@@ -1,7 +1,7 @@
 # Name of algo -> ECR
 tag_name=$1
 model_path=$2
-algorithm_name=sagemaker-deployment-init-hmlr
+algorithm_name=sagemaker-deployment-init-redj
 
 cd src/model_deployment
 

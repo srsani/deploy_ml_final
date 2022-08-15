@@ -127,7 +127,7 @@ def model_creation(s3_bucket, account_id, region, client, role, branch_name, con
     return model_name
 
 
-def endpoint_config_creation(model_name, client):
+def endpoint_config_creation(model_name, client, bucket_name):
     """
     Function creating a new endpoint config file 
 
@@ -159,7 +159,7 @@ def endpoint_config_creation(model_name, client):
         DataCaptureConfig={
             'EnableCapture': True,
             'InitialSamplingPercentage': 100,
-            'DestinationS3Uri': 's3://hmlr-dp-poc4-data/data_capture/s3_folder_prefix',
+            'DestinationS3Uri': f's3://{bucket_name}/data_capture/s3_folder_prefix',
             'CaptureOptions': [
                 {
                     'CaptureMode': 'Output'
@@ -272,7 +272,7 @@ def init_req_info():
             working branch name
         * role: string     
     """
-    bucket_name = get_secret('MLOps', 'HMLR_DEFAULT_BUCKET_NAME')
+    bucket_name = get_secret('MLOps', 'BUCKET_NAME')
     account_id = boto3.client('sts').get_caller_identity()['Account']
     role = get_secret('MLOps', 'EXECUTION_ROLE')
     # region = boto3.Session().region_name
@@ -285,7 +285,7 @@ if __name__ == "__main__":
     client = boto3.client(service_name='sagemaker',
                           region_name='us-east-1')
     bucket_name, account_id, role, region = init_req_info()
-    container_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-deployment-hmlr:s3_folder_prefix'
+    container_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-deployment-redj:s3_folder_prefix'
 
     uncompress_tar('/opt/ml/processing/model/model.tar.gz')
 
@@ -307,7 +307,8 @@ if __name__ == "__main__":
     logger.info(model_name)
 
     end_point_arn, endpoint_config_name = endpoint_config_creation(model_name=model_name,
-                                                                   client=client)
+                                                                   client=client,
+                                                                   bucket_name=bucket_name)
 
     endpoint_name = endpoint_creation(endpoint_config_name=endpoint_config_name,
                                       client=client,

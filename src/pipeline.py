@@ -67,12 +67,11 @@ def get_init_data():
     region = boto3.Session().region_name
     sagemaker_session = get_session(region, bucket_name)
     branch_name = sys.argv[1]
-    # role = 'get_secret('MLOps', 'EXECUTION_ROLE')'
-    role = 'arn:aws:iam::628477620632:role/service-role/AmazonSageMaker-ExecutionRole-20220219T172429'
+    role = get_secret('MLOps', 'EXECUTION_ROLE')
     if branch_name in ['develop', 'staging', 'production']:
         s3_prefix = branch_name
     else:
-        s3_prefix = f'test/{branch_name}'
+        s3_prefix = f'test-{branch_name}'
     return account_id, region, sagemaker_session, branch_name, s3_prefix, bucket_name, role
 
 
@@ -211,7 +210,7 @@ def model_deployment(repository_uri,
                 top_k=0,
                 s3_bucket=model_path),
                 # source=step_preprocess_train.properties.ModelArtifacts.S3ModelArtifacts,
-                # source="s3://hmlr-dp-poc4-data/sagemaker/pipelines-fubxsd6smcxp-Train-Models-K9cOVsLX0P/output/model.tar.gz",
+                # source=f"s3://{bucket_name}/sagemaker/pipelines-fubxsd6smcxp-Train-Models-K9cOVsLX0P/output/model.tar.gz",
                 destination="/opt/ml/processing/model",
             ),
         ],
@@ -370,7 +369,7 @@ def sagemaker_pipeline(bucket_name,
 
 def main():
     """
-    Function to run the pipline
+    Function to run the pipeline
     """
     account_id, region, sagemaker_session, branch_name, s3_prefix, bucket_name, role = get_init_data()
 
@@ -401,10 +400,10 @@ def main():
                    tag_name=branch_name)
     logger.info('model deployment server image pushed to ECR successfully')
 
-    processing_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-processing-hmlr:{branch_name}'
-    model_training_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-train-hmlr:{branch_name}'
-    model_deployment_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-deployment-init-hmlr:{branch_name}'
-    model_deployment_server_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-deployment-hmlr:{branch_name}'
+    processing_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-processing-redj:{branch_name}'
+    model_training_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-train-redj:{branch_name}'
+    model_deployment_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-deployment-init-redj:{branch_name}'
+    model_deployment_server_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-deployment-redj:{branch_name}'
 
     sagemaker_pipeline(bucket_name=bucket_name,
                        branch_name=branch_name,
