@@ -133,7 +133,7 @@ def model_training(repository_uri,
 
     hyperparameter_ranges = {
         "n_estimators": CategoricalParameter([100, 200, 300, 400]),
-        "ccp_alpha": ContinuousParameter(0, 1),
+        "min_samples_split": CategoricalParameter([2, 4, 8]),
     }
     objective_metric_name = "accuracy test"
     objective_type = "Maximize"

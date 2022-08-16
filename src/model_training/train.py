@@ -60,17 +60,18 @@ def make_model_ready_data(df):
 
 def main(df,
          n_estimators,
-         ccp_alpha):
+         min_samples_split):
 
     X_train, y_train, X_val, y_val, X_test, y_test = make_model_ready_data(df)
     model = RandomForestClassifier(n_estimators=n_estimators,
-                                   #    ccp_alpha=ccp_alpha,
+                                   min_samples_split=int(min_samples_split),
                                    n_jobs=-1)
     model.fit(X_train, y_train)
     X = pd.DataFrame(df.features.to_list())
     df['y_pred'] = model.predict(X)
+    y_test_pred = model.predict(X_test)
     # accuracy = model.score(X_test, y_test)
-    accuracy = f1_score(X_test, y_test)
+    accuracy = f1_score(y_test, y_test_pred, average='weighted')
     logger.info(f"\nTest set accuracy: {accuracy} \n")
     df.to_parquet('/opt/ml/model/df.parquet.gzip', compression='gzip')
 
@@ -91,15 +92,15 @@ if __name__ == "__main__":
         help="n_estimators",
     )
     parser.add_argument(
-        "--ccp_alpha",
-        type=float,
-        default=0.0,
-        metavar="ccp",
-        help="ccp_alpha",
+        "--min_samples_split",
+        type=int,
+        default=2,
+        metavar="min_samples_split",
+        help="min_samples_split",
     )
     args = parser.parse_args()
     n_estimators = args.n_estimators
-    ccp_alpha = args.ccp_alpha
+    min_samples_split = args.min_samples_split
     logger.info(glob.glob("*"))
 
     df = pd.read_parquet('/opt/ml/input/data/train/df.parquet.gzip')
@@ -107,7 +108,7 @@ if __name__ == "__main__":
     label_encoder = LabelEncoder()
     df['target_label'] = label_encoder.fit_transform(df.target)
 
-    model = main(df, n_estimators, ccp_alpha)
+    model = main(df, n_estimators, min_samples_split)
     file_name = 'model.tar.gzip'
     object_name = os.path.join('test', os.path.basename(file_name))
 
