@@ -12,7 +12,7 @@ import sys
 
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
-
+from sklearn.metrics import f1_score
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -69,7 +69,8 @@ def main(df,
     model.fit(X_train, y_train)
     X = pd.DataFrame(df.features.to_list())
     df['y_pred'] = model.predict(X)
-    accuracy = model.score(X_test, y_test)
+    # accuracy = model.score(X_test, y_test)
+    accuracy = f1_score(X_test, y_test)
     logger.info(f"\nTest set accuracy: {accuracy} \n")
     df.to_parquet('/opt/ml/model/df.parquet.gzip', compression='gzip')
 

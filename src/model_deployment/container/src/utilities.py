@@ -25,7 +25,7 @@ class Predict():
                * mo
         '''
         s3_client = boto3.client('s3')
-        s3_client.download_file('hmlr-dp-poc4-data',
+        s3_client.download_file('pipeline-tcl-ver1',
                                 f'model/{branch_name}/model.tar.gz',
                                 'models/model.tar.gz')
         file = tarfile.open('models/model.tar.gz')

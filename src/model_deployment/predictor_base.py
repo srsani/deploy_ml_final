@@ -63,7 +63,7 @@ def transformation():
     }
 
     # lod data to s3
-    bucket_name = 'hmlr-dp-poc4-data'
+    bucket_name = 'pipeline-tcl-ver1'
     log_name = str(uuid.uuid4())
     data_key = f'logs/s3_folder_prefix/{log_name}.json'
 

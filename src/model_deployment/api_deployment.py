@@ -135,14 +135,14 @@ def endpoint_config_creation(model_name, client):
         DataCaptureConfig={
             'EnableCapture': True,
             'InitialSamplingPercentage': 100,
-            'DestinationS3Uri': 's3://hmlr-dp-poc4-data/data_capture/',
+            'DestinationS3Uri': 's3:/pipeline-tcl-ver1/data_capture/',
             'CaptureOptions': [
                 {
                     'CaptureMode': 'Output'
                 },
             ],
         }
-        )
+    )
 
     end_point_arn = create_endpoint_config_response['EndpointConfigArn']
     print(f"Endpoint config Arn: {end_point_arn} ")

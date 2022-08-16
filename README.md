@@ -3,12 +3,23 @@
 In the current code repository, you can find the code for the Amazon SageMaker MLOps workflow
 for a Text classification application using Bring Your Own Container (BYOC) approach, which means each note in the pipeline is based on docker image that is stored in Elastic Container Registry (ECR).  This work is the final project for Udacity AWS MLOps nano degree.
 
+Running this repo will create the following resources in AWS:
+
+- One S3 bucket to download the raw file and store the data from the pipeline
+- Fours ECR repositories
+- Register a model in SageMaker
+- Add a model config to SageMaker inference
+- SageMaker pipeline
+- SageMaker end-point
+
 ## Setup
 
 ### AWS side
 
-1- setup SageMaker studio in `us-west-1`
+1- setup SageMaker studio in `us-east-1`
+
 2- make IAM `AmazonSageMaker-ExecutionRole` role with:
+
     - AmazonSageMaker-ExecutionPolicy
     - SecretsManagerReadWrite
     - AutoScalingFullAccess
@@ -16,6 +27,12 @@ for a Text classification application using Bring Your Own Container (BYOC) appr
     - AmazonSageMakerFullAccess
 
 3- add the role that was just created to `AWS Secrets Manager`:
+
+    - Make a MLOps secret group
+![Alt text](images/1.png?raw=true "T")
+
+    - Add the IAM role to `EXECUTION_ROLE`
+![Alt text](images/2.png?raw=true "T")
 
 ### local setup
 
@@ -26,7 +43,7 @@ for a Text classification application using Bring Your Own Container (BYOC) appr
 
 #### update code
 
-Chenge the prefix for all the ECR repositories form `-redj` to some other prefix
+Amend the prefix for all the ECR repositories form `-redj` to some other prefix
 
 - `processing_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-processing-redj:{branch_name}'`
 - `model_training_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-train-redj:{branch_name}'`
