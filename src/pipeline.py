@@ -1,8 +1,8 @@
+from settings import Settings
 from statistics import mode
 import tarfile
 import sys
 import logging
-import environ
 import os
 import boto3
 from datetime import datetime
@@ -23,12 +23,9 @@ from sagemaker.workflow.conditions import ConditionGreaterThanOrEqualTo
 from sagemaker.workflow.condition_step import ConditionStep
 from sagemaker.workflow.functions import JsonGet
 
-from sagemaker.tuner import (
-    IntegerParameter,
-    CategoricalParameter,
-    ContinuousParameter,
-    HyperparameterTuner,
-)
+from sagemaker.tuner import (CategoricalParameter,
+                             HyperparameterTuner,
+                             )
 
 from tools.utils import (get_session,
                          get_secret,
@@ -41,12 +38,6 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 # logger.setLevel(logging.DEBUG)
 logger.addHandler(logging.StreamHandler(sys.stdout))
-
-env = environ.Env(
-    DEBUG=(bool, False)
-)
-environ.Env.read_env()
-pipeline_name = env('PIPELINE_NAME')
 
 
 def get_init_data():
@@ -62,7 +53,7 @@ def get_init_data():
         * branch_name: string
             branch name
     """
-    bucket_name = env('BUCKET_NAME')
+    bucket_name = settings.BUCKET_NAME
     account_id = boto3.client('sts').get_caller_identity().get('Account')
     region = boto3.Session().region_name
     sagemaker_session = get_session(region, bucket_name)
@@ -367,7 +358,7 @@ def sagemaker_pipeline(bucket_name,
     return True
 
 
-def main():
+def main(pipeline_name):
     """
     Function to run the pipeline
     """
@@ -385,19 +376,19 @@ def main():
     logger.info(
         f's3_folder_prefix in deployment_base.py updated with "{s3_prefix}" ')
 
-    push_image_ecr(docker_file_path=env('DATA_PROCESSING_DOCKER'),
-                   tag_name=branch_name)
+    push_image_ecr(docker_file_path=settings.DATA_PROCESSING_DOCKER,
+                   tag_name='latest')
     logger.info('data processing image pushed to ECR successfully')
-    push_image_ecr(docker_file_path=env('MODEL_TRAINING_DOCKER'),
-                   tag_name=branch_name)
+    push_image_ecr(docker_file_path=settings.MODEL_TRAINING_DOCKER,
+                   tag_name='latest')
     logger.info('model training image pushed to ECR successfully')
 
-    push_image_ecr(docker_file_path=env('MODEL_DEPLOYMENT_DOCKER_SAGEMAKER'),
-                   tag_name=branch_name)
+    push_image_ecr(docker_file_path=settings.MODEL_DEPLOYMENT_DOCKER_SAGEMAKER,
+                   tag_name='latest')
     logger.info('model deployment image pushed to ECR successfully')
 
-    push_image_ecr(docker_file_path=env('MODEL_DEPLOYMENT_DOCKER_SERVER'),
-                   tag_name=branch_name)
+    push_image_ecr(docker_file_path=settings.MODEL_DEPLOYMENT_DOCKER_SERVER,
+                   tag_name='latest')
     logger.info('model deployment server image pushed to ECR successfully')
 
     processing_repository_uri = f'{account_id}.dkr.ecr.{region}.amazonaws.com/sagemaker-processing-redj:{branch_name}'
@@ -434,4 +425,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    settings = Settings()
+    pipeline_name = settings.PIPELINE_NAME
+    main(pipeline_name)

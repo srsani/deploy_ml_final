@@ -1,0 +1,28 @@
+name: SagemakerPipeline
+on:
+  push:
+    branches:
+      - main
+      - staging
+      - production
+jobs:
+  TriggerPipeline:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    - name: develop
+      if: ${{ github.ref == 'refs/heads/develop' }}
+      run: bash src_sagemaker/release.sh "develop" 
+    - name: staging
+      if: ${{ github.ref == 'refs/heads/staging' }}
+      run: bash src_sagemaker/release.sh "staging"
+    - name: production
+      if: ${{ github.ref == 'refs/heads/production' }}
+      run: bash src_sagemaker/release.sh "production"
+
+

@@ -13,9 +13,8 @@ main = Predict('models/model.joblib',
                'models/le_classes.npy',
                's3_folder_prefix')
 s3 = boto3.client('s3')
-
+bucket_name = get_secret('MLOps', 'BUCKET_NAME')
 app = Flask(__name__)
-
 
 @app.route('/ping', methods=['GET'])
 def ping():
@@ -62,8 +61,8 @@ def transformation():
         }
     }
 
-    # lod data to s3
-    bucket_name = 'pipeline-tcl-ver1'
+    # load data to s3
+    # bucket_name = get_secret('MLOps', 'BUCKET_NAME')
     log_name = str(uuid.uuid4())
     data_key = f'logs/s3_folder_prefix/{log_name}.json'
 

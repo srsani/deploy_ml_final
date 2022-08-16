@@ -2,8 +2,10 @@ from datetime import datetime
 from sklearn.preprocessing import LabelEncoder
 import numpy as np
 import joblib
+import json
 import re
 import boto3
+from botocore.exceptions import ClientError
 import tarfile
 import spacy
 nlp = spacy.load('en_core_web_md')
@@ -137,7 +139,7 @@ class Predict():
 
 def get_secret(secret_name, secret_key):
     """
-    Function to get secrest from aws.
+    Function to get secret from aws.
     Arguments:
         * secret_name: string
             secret name on aws
