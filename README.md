@@ -36,6 +36,8 @@ Running this repo will create the following resources in AWS:
 
 ### local setup
 
+This repos is tested on python3.8:
+
 - `virtualenv venv --python=python3.8`
 - `pip install ipykernel`
 - `python -m ipykernel install --user --name venv --display-name PYTHON_ENV_NAME`

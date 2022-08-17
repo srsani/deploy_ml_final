@@ -28,6 +28,7 @@ from sagemaker.tuner import (CategoricalParameter,
                              )
 
 from tools.utils import (get_session,
+                         get_bucket_name,
                          get_secret,
                          update_py_file,
                          push_image_ecr,
@@ -53,7 +54,8 @@ def get_init_data():
         * branch_name: string
             branch name
     """
-    bucket_name = settings.BUCKET_NAME
+    bucket_name = get_bucket_name(settings)
+    # bucket_name = settings.BUCKET_NAME
     account_id = boto3.client('sts').get_caller_identity().get('Account')
     region = boto3.Session().region_name
     sagemaker_session = get_session(region, bucket_name)

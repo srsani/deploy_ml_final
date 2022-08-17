@@ -2,7 +2,6 @@ import logging
 from pathlib import Path
 from io import BytesIO
 import os
-import mlflow
 import boto3
 from botocore.exceptions import ClientError
 import json
@@ -10,6 +9,110 @@ import sagemaker.session
 import sagemaker
 import subprocess
 import tarfile
+import uuid
+
+import pandas as pd
+from datasets import (load_dataset, load_dataset_builder)
+
+
+def add_init_data(bucket_name):
+    """
+    Function to download LEDGAR dataset HuggingFace and upload it to the project s3 bucket 
+
+    Args:
+        bucket_name (str): name of the working bucket
+
+    Returns:
+       True: file uploaded correctly
+       False: anything else
+    """
+    try:
+        dataset_builder = load_dataset_builder('lex_glue', 'ledgar')
+        dataset_label = dataset_builder.info.features['label']
+
+        train = load_dataset('lex_glue', 'ledgar', split='train').to_pandas()
+        test = load_dataset('lex_glue', 'ledgar', split='test').to_pandas()
+        validation = load_dataset('lex_glue', 'ledgar',
+                                  split='validation').to_pandas()
+
+        train['clause_type'] = train.label.apply(
+            lambda x: dataset_label.int2str(x))
+        test['clause_type'] = test.label.apply(
+            lambda x: dataset_label.int2str(x))
+        validation['clause_type'] = validation.label.apply(
+            lambda x: dataset_label.int2str(x))
+        df = pd.concat([train, test, validation])
+        df.to_parquet(f's3://{bucket_name}/data/ledgar.parquet.gzip')
+    except ClientError as e:
+        print(str(e))
+        return False
+    return True
+
+
+def get_bucket_name(settings):
+    """
+    get_bucket_name _summary_
+
+    _extended_summary_
+
+    Args:
+        settings (_type_): _description_
+
+    Returns:
+        _type_: _description_
+    """
+    if settings.BUCKET_NAME != '':
+        bucket_name = settings.BUCKET_NAME
+    if settings.BUCKET_NAME == '':
+        bucket_name_prefix = str(uuid.uuid4())
+        bucket_name = f"pipeline-{bucket_name_prefix}"
+        # create the bucket
+        create_bucket(bucket_name)
+        # read and change BUCKET_NAME in settings.py
+        setting_file_path = 'src/settings.py'
+        f1 = open(setting_file_path, "rt")
+        data = f1.read()
+        data = data.replace("BUCKET_NAME = \'\'\n",
+                            f"BUCKET_NAME = \'{bucket_name}'\n")
+        f1.close()
+        # updated settings.py file
+        f1 = open(setting_file_path, "wt")
+        f1.write(data)
+        f1.close()
+        # adding ledgar data to the bucket
+        add_init_data(bucket_name)
+    return bucket_name
+
+
+def create_bucket(bucket_name, region=None):
+    """
+    If a region is not specified, the bucket is created in the S3 default
+    region (us-east-1).
+
+
+    Args:
+        bucket_name (str): bucket name to create
+        region (str):  String region to create bucket in, e.g., 'us-west-2'
+
+    Returns:
+        True: bucket created
+        False: bucket not created
+    """
+
+    # Create bucket
+    try:
+        if region is None:
+            s3_client = boto3.client('s3')
+            s3_client.create_bucket(Bucket=bucket_name)
+        else:
+            s3_client = boto3.client('s3', region_name=region)
+            location = {'LocationConstraint': region}
+            s3_client.create_bucket(Bucket=bucket_name,
+                                    CreateBucketConfiguration=location)
+    except ClientError as e:
+        logging.error(e)
+        return False
+    return True
 
 
 def get_secret(secret_name, secret_key):

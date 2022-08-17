@@ -258,7 +258,6 @@ def get_spacy_embeddings(df, column_name, model):
 def data_process_main(input_data_path):
     nlp = spacy.load("en_core_web_md")
     df = pd.read_parquet(input_data_path)
-    df.drop(columns=['data_type'], inplace=True)
     # adding meta data to df
     df = add_meta_data__raw(df)
     # making train test split
@@ -273,7 +272,8 @@ def data_process_main(input_data_path):
     # cleaning the text
     df_out['clean_description'] = df_out['text'].apply(clean_text)
     # selecting the output columns
-    df_out_test = df_out[['pk', 'document_id', 'paragraph_id', 'year', 'text',
+    print(df.columns)
+    df_out_test = df_out[['pk', 'document_id', 'paragraph_id', 'text',
                           'clean_description', 'data_type', 'clause_type', 'target', 'event_time']].copy()
     df_out_test = down_sample(df_out_test)
     df_out_test = get_spacy_embeddings(df_out_test, 'clean_description', nlp)
